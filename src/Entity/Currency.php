@@ -6,5 +6,7 @@ namespace PayZero\App\Entity;
 
 class Currency
 {
-
+    public function __construct(private readonly string $currency)
+    {
+    }
 }

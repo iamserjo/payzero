@@ -6,5 +6,4 @@ namespace PayZero\App\Service;
 
 class Withdraw
 {
-
 }

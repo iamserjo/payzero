@@ -6,5 +6,4 @@ namespace PayZero\App\Rule;
 
 class Deposit
 {
-
 }

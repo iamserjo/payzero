@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PayZero\App\Factory;
 
-use \PayZero\App\Entity\Client\Type as ClientTypeInterface;
+use PayZero\App\Entity\Client\Type as ClientTypeInterface;
 
 class ClientType
 {
-    public static function create($type) : ClientTypeInterface
+    public static function create($type): ClientTypeInterface
     {
         $class = '\PayZero\App\Entity\Client\\'.ucfirst($type).'Type';
 
-        if (!class_exists($class) || !($typeClass = new $class) instanceof ClientTypeInterface) {
+        if (!class_exists($class) || !($typeClass = new $class()) instanceof ClientTypeInterface) {
             throw new \Exception('client type '.$type.' failure');
         }
 
