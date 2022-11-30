@@ -4,6 +4,25 @@ declare(strict_types=1);
 
 namespace PayZero\App\Entity\Operation;
 
-class WithdrawType implements Type
+use PayZero\App\Contract\OperationType;
+use PayZero\App\Rule\PrivateWithdraw;
+
+class WithdrawType implements OperationType
 {
+    protected string $typeName = '';
+
+    public function setTypeName(string $name)
+    {
+        $this->typeName = $name;
+    }
+
+    public function getTypeName(): string
+    {
+        return $this->typeName;
+    }
+
+    public function getRuleClass(): string
+    {
+        return PrivateWithdraw::class;
+    }
 }

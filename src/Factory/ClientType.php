@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PayZero\App\Factory;
 
-use PayZero\App\Entity\Client\Type as ClientTypeInterface;
+use PayZero\App\Contract\ClientType as ClientTypeInterface;
 
 class ClientType
 {

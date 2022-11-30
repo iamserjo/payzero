@@ -6,10 +6,12 @@ namespace PayZero\App\Entity;
 
 class User
 {
-    private $id;
-
-    public function __construct(int $id)
+    public function __construct(private readonly int $id)
     {
-        $this->id = $id;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 }
