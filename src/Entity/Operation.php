@@ -11,17 +11,18 @@ class Operation
 {
     private Commission $commission;
 
-    public function __construct(private readonly \DateTimeInterface $date,
-                                private User $user,
-                                private ClientType $clientType,
-                                private OperationType $operationType,
-                                private string $amount,
-                                private Currency $currency
+    public function __construct(
+        private readonly \DateTimeInterface $date,
+        private readonly User $user,
+        private readonly ClientType $clientType,
+        private readonly OperationType $operationType,
+        private readonly string $amount,
+        private readonly Currency $currency
     ) {
         $this->commission = new Commission();
     }
 
-    public function getDate(): \DateTime
+    public function getDate(): \DateTimeInterface
     {
         return $this->date;
     }

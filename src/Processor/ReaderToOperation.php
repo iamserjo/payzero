@@ -28,7 +28,7 @@ class ReaderToOperation
         return $this->operations;
     }
 
-    private function process()
+    private function process(): void
     {
         foreach ($this->reader->getLines() as $line) {
             $this->operations[] = new Operation(

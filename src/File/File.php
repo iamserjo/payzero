@@ -17,7 +17,7 @@ class File
         echo $this->fileName;
     }
 
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->directory.'/'.$this->fileName;
     }
