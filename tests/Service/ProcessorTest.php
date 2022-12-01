@@ -177,6 +177,14 @@ class ProcessorTest extends TestCase
             '2016-01-05,4,private,withdraw,1000.00,EUR' => [2, '0.00'],
             '2016-01-05,1,private,deposit,200.00,EUR' => [3, '0.06'],
             '2016-01-06,2,business,withdraw,300.00,EUR' => [4, '1.50'],
+            '2016-01-06,1,private,withdraw,30000,JPY' => [5, '0'],
+            '2016-01-07,1,private,withdraw,1000.00,EUR' => [6, '0.70'],
+            '2016-01-07,1,private,withdraw,100.00,USD' => [7, '0.30'],
+            '2016-01-10,1,private,withdraw,100.00,EUR' => [8, '0.30'],
+            '2016-01-10,2,business,deposit,10000.00,EUR' => [9, '3.00'],
+            '2016-01-10,3,private,withdraw,1000.00,EUR' => [10, '0.00'],
+            '2016-02-15,1,private,withdraw,300.00,EUR' => [11, '0.00'],
+            '2016-02-19,5,private,withdraw,3000000,JPY' => [12, '8612'],
         ];
     }
 }
