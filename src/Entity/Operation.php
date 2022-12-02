@@ -32,6 +32,11 @@ class Operation
         return $this->amount;
     }
 
+    public function getAmountPrecision(): int
+    {
+        return strlen(explode('.', $this->amount)[1] ?? '') ?? 0;
+    }
+
     public function getUser(): User
     {
         return $this->user;

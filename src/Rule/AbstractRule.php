@@ -6,10 +6,12 @@ namespace PayZero\App\Rule;
 
 use PayZero\App\Contract\Rule;
 use PayZero\App\Entity\Operation;
+use PayZero\App\Service\ExchangeRateConvertor;
 
 abstract class AbstractRule implements Rule
 {
     public function __construct(
+        private readonly ExchangeRateConvertor $exchangeRateConvertor,
         private readonly Operation $operation,
         private readonly string $baseCurrencyAmount,
         private string $remainNoFeeAmount,
@@ -27,6 +29,11 @@ abstract class AbstractRule implements Rule
     public function getOperation(): Operation
     {
         return $this->operation;
+    }
+
+    public function getExchangeRateConvertor(): ExchangeRateConvertor
+    {
+        return $this->exchangeRateConvertor;
     }
 
     public function getBaseCurrencyAmount(): string

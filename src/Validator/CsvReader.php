@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PayZero\App\Validator;
 
 use PayZero\App\Contract\Validator;
@@ -40,7 +42,7 @@ class CsvReader implements Validator
     private function assertDateValid($value): void
     {
         if (!strtotime($value)) {
-            throw new CvsFormatNotSupportedException('Date ' . $value . ' is not valid');
+            throw new CvsFormatNotSupportedException('Date '.$value.' is not valid');
         }
     }
 
@@ -50,7 +52,7 @@ class CsvReader implements Validator
     private function assertUserValid($value): void
     {
         if (!ctype_digit($value)) {
-            throw new CvsFormatNotSupportedException('User id "' . $value . '" is not a number');
+            throw new CvsFormatNotSupportedException('User id "'.$value.'" is not a number');
         }
     }
 
@@ -59,8 +61,8 @@ class CsvReader implements Validator
      */
     private function assertClientTypeValid($value): void
     {
-        if (!in_array($value, ['business', 'private'])) {
-            throw new CvsFormatNotSupportedException('Client type ' . $value . ' is not valid');
+        if (!in_array($value, ['business', 'private'], true)) {
+            throw new CvsFormatNotSupportedException('Client type '.$value.' is not valid');
         }
     }
 
@@ -69,8 +71,8 @@ class CsvReader implements Validator
      */
     private function assertOperationTypeValid($value): void
     {
-        if (!in_array($value, ['withdraw', 'deposit'])) {
-            throw new CvsFormatNotSupportedException('Operation type ' . $value . ' is not valid');
+        if (!in_array($value, ['withdraw', 'deposit'], true)) {
+            throw new CvsFormatNotSupportedException('Operation type '.$value.' is not valid');
         }
     }
 
@@ -80,7 +82,7 @@ class CsvReader implements Validator
     private function assertAmountValueValid($value): void
     {
         if (!is_numeric($value)) {
-            throw new CvsFormatNotSupportedException('Amount value ' . $value . ' is not valid');
+            throw new CvsFormatNotSupportedException('Amount value '.$value.' is not valid');
         }
     }
 
@@ -89,8 +91,8 @@ class CsvReader implements Validator
      */
     private function assertCurrencyValid($string): void
     {
-        if (strlen($string) !== 3) { //it will be double-checked later in the code for existing the currency
-            throw new CvsFormatNotSupportedException('Currency value ' . $string . ' is not valid');
+        if (strlen($string) !== 3) { // it will be double-checked later in the code for existing the currency
+            throw new CvsFormatNotSupportedException('Currency value '.$string.' is not valid');
         }
     }
 }

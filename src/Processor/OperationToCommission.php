@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace PayZero\App\Processor;
 
+use PayZero\App\Contract\ExchangeRateProvider;
 use PayZero\App\Entity\Operation;
 use PayZero\App\Exception\CurrencyNotFound;
 use PayZero\App\Factory\Rule;
-use PayZero\App\Service\ExchangeRateClient;
 use PayZero\App\Service\ExchangeRateConvertor;
-use PayZero\App\Service\ExchangeRateProvider;
 
 class OperationToCommission
 {
@@ -21,7 +20,7 @@ class OperationToCommission
     /**
      * Pool of dates: weeks.
      */
-    private array $commissionPool = [];
+    private array $commissionsGroupedByWeek = [];
 
     private ExchangeRateConvertor $exchangeRateConvertor;
 
@@ -30,30 +29,29 @@ class OperationToCommission
      */
     public function __construct(
         private readonly array $operations,
-        private \PayZero\App\Contract\ExchangeRateProvider $exchangeRateProvider
+        private readonly ExchangeRateProvider $exchangeRateProvider
     ) {
-        $this->exchangeRateProvider = new ExchangeRateProvider(new ExchangeRateClient());
         $this->exchangeRateConvertor = new ExchangeRateConvertor($this->exchangeRateProvider);
         $this->groupByWeeks();
     }
 
     /**
      * @return Operation[]
+     *
      * @throws CurrencyNotFound
      */
-    public function getCalculatedCommissions(): array
+    public function getCalculatedOperations(): array
     {
         return $this->calculateCommission();
     }
 
     /**
      * @return Operation[]
-     * @throws CurrencyNotFound
      */
     private function calculateCommission(): array
     {
         $resultOperations = [];
-        foreach ($this->commissionPool as $groupedPool) {
+        foreach ($this->commissionsGroupedByWeek as $groupedPool) {
             $remainNoFeeAmount = self::NO_FEE_AMOUNT;
             $operationCounter = self::NO_FEE_TRANSACTION_COUNT;
             var_dump('===============');
@@ -65,21 +63,25 @@ class OperationToCommission
 
                 $baseCurrencyAmount = $operation->getAmount();
 
-                //converting remain no fee amount to currency of operation
+                // converting remain no fee amount to currency of operation
                 $remainNoFeeAmount = $this->exchangeRateConvertor->convert(
                     $remainNoFeeAmount,
                     $operation->getCurrency()
                 );
 
-                // TODO: precision for JPY and rest
-                $rule = Rule::create($operation, $baseCurrencyAmount, $remainNoFeeAmount, $operationCounter);
+                $rule = Rule::create(
+                    $this->exchangeRateConvertor,
+                    $operation,
+                    $baseCurrencyAmount,
+                    $remainNoFeeAmount,
+                    $operationCounter
+                );
                 $rule->calculate();
                 $operationCounter = $rule->getRemainNoFeeOperationCount();
-                $remainNoFeeAmount = $rule->getRemainNoFeeAmount();
-//                $remainNoFeeAmount = $this->exchangeRateConvertor->convert(
-//                    $rule->getRemainNoFeeAmount(),
-//                    $this->exchangeRateProvider->getBaseCurrency()
-//                );
+                $remainNoFeeAmount = $this->exchangeRateConvertor->convertToBaseCurrency(
+                    $rule->getRemainNoFeeAmount(),
+                    $operation->getCurrency(),
+                );
 
                 var_dump('base amount '.$baseCurrencyAmount);
             }
@@ -93,11 +95,13 @@ class OperationToCommission
      */
     public function groupByWeeks(): void
     {
+//        $a = [];
         foreach ($this->operations as $operation) {
             $groupByString = $this->getGroupByString($operation);
-            $this->commissionPool[$groupByString][] = $operation;
+            $this->commissionsGroupedByWeek[$groupByString][] = $operation;
+//            $a[$groupByString][] = $operation->getAmount();
         }
-//        var_dump($this->commissionPool);
+//        var_dump($a);exit;
     }
 
     private function getGroupByString(Operation $operation): string

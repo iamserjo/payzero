@@ -10,25 +10,28 @@ use PayZero\App\Entity\User;
 use PayZero\App\Factory\ClientType;
 use PayZero\App\Factory\OperationType;
 use PayZero\App\Processor\OperationToCommission;
-use PayZero\App\Service\ExchangeRateClient;
 use PayZero\App\Tests\FakeService\ExchangeRateProvider;
 use PHPUnit\Framework\TestCase;
 
-class ProcessorTest extends TestCase
+class OperationToCommissionTest extends TestCase
 {
     /**
      * @var Operation[]
      */
-    public static array $operations = [];
+    public static array $operationsFromHomework = [];
+
+    /**
+     * @var Operation[]
+     */
+    public static array $operationsMoreThanThree = [];
 
     public static function setUpBeforeClass(): void
     {
-        $operations = self::getOperationsFixture();
-        $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
-        self::$operations = $operationToCommission->getCalculatedCommissions();
+        self::initOperationsFromHomework();
+        self::initOperationsWhenMoreThanThree();
     }
 
-    private static function getOperationsFixture(): array
+    private static function getOperationsFromHomeworkFixture(): array
     {
         return [
             //2014-12-31,4,private,withdraw,1200.00,EUR
@@ -151,11 +154,93 @@ class ProcessorTest extends TestCase
         ];
     }
 
-    public function testCount()
+    private static function getOperationsWhenMoreThanThreeFixture(): array
+    {
+        return [
+            //2015-01-01,1,private,deposit,200.00,EUR
+            new Operation(
+                new \DateTime('2015-01-01'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('deposit'),
+                '200.00',
+                new Currency('EUR')
+            ),
+            //2014-12-31,1,private,withdraw,200.00,EUR
+            new Operation(
+                new \DateTime('2014-12-31'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '200.00',
+                new Currency('EUR')
+            ),
+            //2015-01-01,1,private,withdraw,100.00,EUR
+            new Operation(
+                new \DateTime('2015-01-01'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '100.00',
+                new Currency('EUR')
+            ),
+            //2015-01-01,1,private,withdraw,50.00,EUR
+            new Operation(
+                new \DateTime('2015-01-01'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '50.00',
+                new Currency('EUR')
+            ),
+            //2015-01-02,1,private,withdraw,100.00,EUR
+            new Operation(
+                new \DateTime('2015-01-02'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '100.00',
+                new Currency('EUR')
+            ),
+            //2015-01-02,1,business,withdraw,2000.00,EUR
+            new Operation(
+                new \DateTime('2015-01-02'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '2000.00',
+                new Currency('EUR')
+            ),
+        ];
+    }
+
+    private static function initOperationsFromHomework(): void
+    {
+        $operations = self::getOperationsFromHomeworkFixture();
+        $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
+        self::$operationsFromHomework = $operationToCommission->getCalculatedOperations();
+    }
+
+    private static function initOperationsWhenMoreThanThree(): void
+    {
+        $operations = self::getOperationsWhenMoreThanThreeFixture();
+        $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
+        self::$operationsMoreThanThree = $operationToCommission->getCalculatedOperations();
+    }
+
+    public function testCountForHomework(): void
     {
         $this->assertCount(
             13,
-            self::$operations
+            self::$operationsFromHomework
+        );
+    }
+
+    public function testCountWhenMoreThanThree(): void
+    {
+        $this->assertCount(
+            6,
+            self::$operationsMoreThanThree
         );
     }
 
@@ -163,18 +248,45 @@ class ProcessorTest extends TestCase
      * @param int $index
      * @param string $expectation
      *
-     * @dataProvider dataProviderForOperationToCommission
-     * @depends testCount
+     * @dataProvider dataProviderForOperationToCommissionFromHomework
+     * @depends      testCountForHomework
      */
-    public function testOperationsToCommission(int $index, string $expectation): void
+    public function testOperationsToCommissionFromHomework(int $index, string $expectation): void
     {
         $this->assertEquals(
             $expectation,
-            self::$operations[$index]->getCommission()->getCommissionAmount()
+            self::$operationsFromHomework[$index]->getCommission()->getCommissionAmount()
         );
     }
 
-    public function dataProviderForOperationToCommission(): array
+    /**
+     * @param int $index
+     * @param string $expectation
+     *
+     * @dataProvider dataProviderForOperationToCommissionWhenMoreThanThree
+     * @depends      testCountWhenMoreThanThree
+     */
+    public function testOperationsToCommissionWhenMoreThanThree(int $index, string $expectation): void
+    {
+        $this->assertEquals(
+            $expectation,
+            self::$operationsMoreThanThree[$index]->getCommission()->getCommissionAmount()
+        );
+    }
+
+    public function dataProviderForOperationToCommissionWhenMoreThanThree(): array
+    {
+        return [
+            '2015-01-01,1,private,deposit,200.00,EUR' => [0, '0.06'],
+            '2014-12-31,1,private,withdraw,200.00,EUR' => [1, '0.00'],
+            '2015-01-01,1,private,withdraw,100.00,EUR' => [2, '0.00'],
+            '2015-01-01,1,private,withdraw,50.00,EUR' => [3, '0.00'],
+            '2015-01-02,1,business,withdraw,100.00,EUR' => [4, '0.30'],
+            '2015-01-02,1,business,withdraw,2000.00,EUR' => [5, '6.00'],
+        ];
+    }
+
+    public function dataProviderForOperationToCommissionFromHomework(): array
     {
         return [
             '2014-12-31,4,private,withdraw,1200.00,EUR' => [0, '0.60'],

@@ -6,10 +6,12 @@ namespace PayZero\App\Factory;
 
 use PayZero\App\Contract\Rule as RuleInterface;
 use PayZero\App\Entity\Operation;
+use PayZero\App\Service\ExchangeRateConvertor;
 
 class Rule
 {
     public static function create(
+        ExchangeRateConvertor $exchangeRateConvertor,
         Operation $operation,
         string $baseCurrencyAmount,
         string $remainNoFeeAmount,
@@ -21,6 +23,6 @@ class Rule
             $class = $operation->getClientType()->getRuleClass();
         }
 
-        return new $class($operation, $baseCurrencyAmount, $remainNoFeeAmount, $operationCounter);
+        return new $class($exchangeRateConvertor, $operation, $baseCurrencyAmount, $remainNoFeeAmount, $operationCounter);
     }
 }

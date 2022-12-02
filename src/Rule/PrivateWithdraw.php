@@ -11,24 +11,21 @@ class PrivateWithdraw extends AbstractRule
 
     public function calculate(): self
     {
-        $commissionPercent = self::NO_FEE_OPERATION_NUMBER > 3 ? self::FEE_PERCENTAGE / '100' : '1';
-
-        //(3000000-(1000*129.53))*0.3/100*1
-        //$this->getBaseCurrencyAmount()-($this->getRemainNoFeeAmount()*)
-
-        // decrease number of no fee operations
-        $this->setRemainNoFeeOperationCount($this->getRemainNoFeeOperationCount() + 1);
-
-
+        if ($this->getRemainNoFeeOperationCount() !== 0) {
+            // decrease number of no fee operations
+            $this->setRemainNoFeeOperationCount($this->getRemainNoFeeOperationCount() - 1);
+        } else {
+            $this->setRemainNoFeeAmount('0');
+        }
 
         if (($commissionFromAmount = bcsub($this->getBaseCurrencyAmount(), $this->getRemainNoFeeAmount())) <= 0) {
             // no fee logic
             $this->setRemainNoFeeAmount(bcsub($this->getRemainNoFeeAmount(), $this->getBaseCurrencyAmount()));
-            $this->getOperation()->getCommission()->setCommissionAmount('0.00');
 
             $this->getOperation()->getCommission()->setCommissionAmount(
-                bcmul(
-                    $commissionFromAmount, $commissionPercent, 2
+                $this->getExchangeRateConvertor()->roundUp(
+                    '0',
+                    $this->getOperation()->getAmountPrecision()
                 )
             );
 
@@ -36,15 +33,19 @@ class PrivateWithdraw extends AbstractRule
             var_dump('commission '.$this->getOperation()->getCommission()->getCommissionAmount());
         } else { // apply the fee
             $this->setRemainNoFeeAmount('0');
-            $this->getOperation()->getCommission()->setCommissionAmount(
-                bcmul(
-                    $commissionFromAmount, $commissionPercent, 2
-                )
+
+            $commission = bcmul($commissionFromAmount, (string) (self::FEE_PERCENTAGE / 100), 3);
+            var_dump("comission from amount $commissionFromAmount percent ".(string) (self::FEE_PERCENTAGE / 100));
+            var_dump('Multiplied '.$commission);
+            $commission = $this->getExchangeRateConvertor()->roundUp(
+                $commission,
+                $this->getOperation()->getAmountPrecision()
             );
 
-            var_dump("comissionfromamount $commissionFromAmount, percent $commissionPercent");
+            $this->getOperation()->getCommission()->setCommissionAmount($commission);
 
             var_dump('remain no fee! '.$this->getRemainNoFeeAmount());
+
             var_dump('commission '.$this->getOperation()->getCommission()->getCommissionAmount());
         }
 
