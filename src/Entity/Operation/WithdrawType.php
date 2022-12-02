@@ -11,7 +11,7 @@ class WithdrawType implements OperationType
 {
     protected string $typeName = '';
 
-    public function setTypeName(string $name)
+    public function setTypeName(string $name): void
     {
         $this->typeName = $name;
     }

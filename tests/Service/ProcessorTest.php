@@ -10,7 +10,8 @@ use PayZero\App\Entity\User;
 use PayZero\App\Factory\ClientType;
 use PayZero\App\Factory\OperationType;
 use PayZero\App\Processor\OperationToCommission;
-use PayZero\App\Tests\FakeService\ExchangeRate;
+use PayZero\App\Service\ExchangeRateClient;
+use PayZero\App\Tests\FakeService\ExchangeRateProvider;
 use PHPUnit\Framework\TestCase;
 
 class ProcessorTest extends TestCase
@@ -22,7 +23,14 @@ class ProcessorTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $operations = [
+        $operations = self::getOperationsFixture();
+        $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
+        self::$operations = $operationToCommission->getCalculatedCommissions();
+    }
+
+    private static function getOperationsFixture(): array
+    {
+        return [
             //2014-12-31,4,private,withdraw,1200.00,EUR
             new Operation(
                 new \DateTime('2014-12-31'),
@@ -87,63 +95,60 @@ class ProcessorTest extends TestCase
                 new Currency('EUR')
             ),
             //2016-01-07,1,private,withdraw,100.00,USD
-                new Operation(
-                    new \DateTime('2016-01-07'),
-                    new User(1),
-                    ClientType::create('private'),
-                    OperationType::create('withdraw'),
-                    '100.00',
-                    new Currency('USD')
-                ),
+            new Operation(
+                new \DateTime('2016-01-07'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '100.00',
+                new Currency('USD')
+            ),
             //2016-01-10,1,private,withdraw,100.00,EUR
-                new Operation(
-                    new \DateTime('2016-01-10'),
-                    new User(1),
-                    ClientType::create('private'),
-                    OperationType::create('withdraw'),
-                    '100.00',
-                    new Currency('EUR')
-                ),
+            new Operation(
+                new \DateTime('2016-01-10'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '100.00',
+                new Currency('EUR')
+            ),
             //2016-01-10,2,business,deposit,10000.00,EUR
-                new Operation(
-                    new \DateTime('2016-01-10'),
-                    new User(2),
-                    ClientType::create('business'),
-                    OperationType::create('deposit'),
-                    '10000.00',
-                    new Currency('EUR')
-                ),
+            new Operation(
+                new \DateTime('2016-01-10'),
+                new User(2),
+                ClientType::create('business'),
+                OperationType::create('deposit'),
+                '10000.00',
+                new Currency('EUR')
+            ),
             //2016-01-10,3,private,withdraw,1000.00,EUR
-                new Operation(
-                    new \DateTime('2016-01-10'),
-                    new User(3),
-                    ClientType::create('private'),
-                    OperationType::create('withdraw'),
-                    '1000.00',
-                    new Currency('EUR')
-                ),
+            new Operation(
+                new \DateTime('2016-01-10'),
+                new User(3),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '1000.00',
+                new Currency('EUR')
+            ),
             //2016-02-15,1,private,withdraw,300.00,EUR
-                new Operation(
-                    new \DateTime('2016-02-15'),
-                    new User(1),
-                    ClientType::create('private'),
-                    OperationType::create('withdraw'),
-                    '300.00',
-                    new Currency('EUR')
-                ),
+            new Operation(
+                new \DateTime('2016-02-15'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '300.00',
+                new Currency('EUR')
+            ),
             //2016-02-19,5,private,withdraw,3000000,JPY
-                new Operation(
-                    new \DateTime('2016-02-19'),
-                    new User(5),
-                    ClientType::create('private'),
-                    OperationType::create('withdraw'),
-                    '3000000',
-                    new Currency('JPY')
-                ),
+            new Operation(
+                new \DateTime('2016-02-19'),
+                new User(5),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '3000000',
+                new Currency('JPY')
+            ),
         ];
-
-        $operationToCommission = new OperationToCommission($operations, new ExchangeRate());
-        self::$operations = $operationToCommission->getCalculatedCommissions();
     }
 
     public function testCount()
@@ -158,10 +163,10 @@ class ProcessorTest extends TestCase
      * @param int $index
      * @param string $expectation
      *
-     * @dataProvider dataProviderForAddTesting
+     * @dataProvider dataProviderForOperationToCommission
      * @depends testCount
      */
-    public function testAdd(int $index, string $expectation)
+    public function testOperationsToCommission(int $index, string $expectation): void
     {
         $this->assertEquals(
             $expectation,
@@ -169,7 +174,7 @@ class ProcessorTest extends TestCase
         );
     }
 
-    public function dataProviderForAddTesting(): array
+    public function dataProviderForOperationToCommission(): array
     {
         return [
             '2014-12-31,4,private,withdraw,1200.00,EUR' => [0, '0.60'],

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace PayZero\App\File;
 
-use PayZero\App\Exception\Console\CvsFormatNotSupportedException;
+use PayZero\App\Contract\Reader;
+use PayZero\App\Exception\CvsFormatNotSupportedException;
 
 class CsvReader implements Reader
 {
@@ -34,12 +35,11 @@ class CsvReader implements Reader
         }
     }
 
+    /**
+     * @throws CvsFormatNotSupportedException
+     */
     private function validateFile(): void
     {
-        foreach ($this->output as $line) {
-            if (count($line) !== 6) {
-                throw new CvsFormatNotSupportedException('File format is not supported');
-            }
-        }
+        (new \PayZero\App\Validator\CsvReader())->validate($this->output);
     }
 }

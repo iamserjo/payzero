@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace PayZero\App\Console;
 
-use PayZero\App\Exception\Console\FirstArgumentMissingException;
+use PayZero\App\Exception\ConsoleArgumentMissingException;
+use PayZero\App\Validator\ArgumentReader as ArgumentReaderValidator;
 
 class ArgumentReader
 {
     /**
-     * @throws FirstArgumentMissingException
+     * @throws ConsoleArgumentMissingException
      */
     public function __construct(private readonly array $arguments)
     {
@@ -27,12 +28,10 @@ class ArgumentReader
     }
 
     /**
-     * @throws FirstArgumentMissingException
+     * @throws ConsoleArgumentMissingException
      */
     private function validateArguments(): void
     {
-        if (empty($this->arguments[1])) {
-            throw new FirstArgumentMissingException('First argument is required');
-        }
+        (new ArgumentReaderValidator())->validate($this->arguments);
     }
 }

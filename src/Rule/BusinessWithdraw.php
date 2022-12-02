@@ -6,7 +6,7 @@ namespace PayZero\App\Rule;
 
 class BusinessWithdraw extends AbstractRule
 {
-    public function process(): self
+    public function calculate(): self
     {
         $this
             ->getOperation()

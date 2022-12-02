@@ -12,16 +12,15 @@ class Rule
     public static function create(
         Operation $operation,
         string $baseCurrencyAmount,
-        string $remainNoFeeAmount
+        string $remainNoFeeAmount,
+        int $operationCounter
     ): RuleInterface {
         if ($operation->getOperationType() instanceof Operation\DepositType) {
             $class = $operation->getOperationType()->getRuleClass();
-
-            return new $class($operation, $baseCurrencyAmount, $remainNoFeeAmount);
         } else {
             $class = $operation->getClientType()->getRuleClass();
-
-            return new $class($operation, $baseCurrencyAmount, $remainNoFeeAmount);
         }
+
+        return new $class($operation, $baseCurrencyAmount, $remainNoFeeAmount, $operationCounter);
     }
 }

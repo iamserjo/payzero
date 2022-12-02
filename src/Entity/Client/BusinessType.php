@@ -11,7 +11,7 @@ class BusinessType implements ClientType
 {
     protected string $typeName = '';
 
-    public function setTypeName(string $name)
+    public function setTypeName(string $name): void
     {
         $this->typeName = $name;
     }

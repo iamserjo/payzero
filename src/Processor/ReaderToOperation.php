@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace PayZero\App\Processor;
 
+use PayZero\App\Contract\Reader;
 use PayZero\App\Entity\Currency;
 use PayZero\App\Entity\Operation;
 use PayZero\App\Entity\User;
 use PayZero\App\Factory\ClientType;
 use PayZero\App\Factory\OperationType;
-use PayZero\App\File\Reader;
 
 class ReaderToOperation
 {

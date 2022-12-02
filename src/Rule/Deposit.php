@@ -6,7 +6,7 @@ namespace PayZero\App\Rule;
 
 class Deposit extends AbstractRule
 {
-    public function process(): self
+    public function calculate(): self
     {
         $this->getOperation()->getCommission()->setCommissionAmount(
             bcmul(
@@ -16,5 +16,10 @@ class Deposit extends AbstractRule
         var_dump('deopsit commission '.$this->getOperation()->getCommission()->getCommissionAmount());
 
         return $this;
+    }
+
+    public function getCalculatedNoFeeOperationCount(): int
+    {
+        return $this->getRemainNoFeeOperationCount();
     }
 }

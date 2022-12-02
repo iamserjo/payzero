@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace PayZero\App\File;
+namespace PayZero\App\Contract;
+
+use PayZero\App\File\File;
 
 interface Reader
 {

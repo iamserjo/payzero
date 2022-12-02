@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PayZero\App\File;
 
-use PayZero\App\Exception\Console\FileDoesNotExist;
+use PayZero\App\Exception\FileDoesNotExist;
 
 class File
 {
