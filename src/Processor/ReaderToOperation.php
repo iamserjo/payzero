@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace PayZero\App\Processor;
 
+use Exception;
 use PayZero\App\Contract\Reader;
 use PayZero\App\Entity\Currency;
 use PayZero\App\Entity\Operation;
 use PayZero\App\Entity\User;
+use PayZero\App\Exception\FactoryCreationFailure;
 use PayZero\App\Factory\ClientType;
 use PayZero\App\Factory\OperationType;
 
@@ -29,12 +31,13 @@ class ReaderToOperation
     }
 
     /**
-     * @throws \Exception
+     * @throws FactoryCreationFailure
+     * @throws Exception
      */
-    private function process(): void
+    private function process(): \Generator
     {
         foreach ($this->reader->getLines() as $line) {
-            $this->operations[] = new Operation(
+            yield new Operation(
                 new \DateTime((string) $line[0]),
                 new User((int) $line[1]),
                 ClientType::create((string) $line[2]),

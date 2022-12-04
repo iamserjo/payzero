@@ -6,7 +6,7 @@ namespace PayZero\App\Rule;
 
 class Deposit extends AbstractRule
 {
-    public const COMMISSION_PERCENTAGE = '0.03';
+    public const FEE_PERCENTAGE = '0.03';
 
     public function calculate(): void
     {
@@ -14,7 +14,7 @@ class Deposit extends AbstractRule
             $this->getExchangeRateConvertor()->roundUp(
                 bcmul(
                     $this->getOperation()->getAmount(),
-                    (string) (self::COMMISSION_PERCENTAGE / 100),
+                    (string) (self::FEE_PERCENTAGE / 100),
                     3
                 ),
                 $this->getOperation()->getAmountPrecision()

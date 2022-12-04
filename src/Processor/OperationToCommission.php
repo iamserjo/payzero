@@ -53,15 +53,13 @@ class OperationToCommission
     private function calculateCommission(): array
     {
         $resultOperations = [];
-        foreach ($this->commissionsGroupedByWeek as $groupedPool) {
+        foreach ($this->commissionsGroupedByWeek as $groupedByWeek) {
             $remainNoFeeAmount = self::NO_FEE_AMOUNT;
             $operationCounter = self::NO_FEE_TRANSACTION_COUNT;
 
-            /** @var Operation[] $groupedPool */
-            foreach ($groupedPool as $operation) {
+            /** @var Operation[] $groupedByWeek */
+            foreach ($groupedByWeek as $operation) {
                 $resultOperations[] = $operation;
-
-                $baseCurrencyAmount = $operation->getAmount();
 
                 // converting remain no fee amount to currency of operation
                 $remainNoFeeAmount = $this->exchangeRateConvertor->convert(

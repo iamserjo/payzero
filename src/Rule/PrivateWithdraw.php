@@ -6,7 +6,6 @@ namespace PayZero\App\Rule;
 
 class PrivateWithdraw extends AbstractRule
 {
-    public const NO_FEE_OPERATION_NUMBER = 3;
     public const FEE_PERCENTAGE = '0.3';
 
     public function calculate(): void

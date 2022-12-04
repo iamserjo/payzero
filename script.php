@@ -13,6 +13,7 @@ require  __DIR__ . '/vendor/autoload.php';
 
 try {
     $dotenv = new Dotenv();
+    $dotenv->usePutenv();
     $dotenv->load(__DIR__.'/.env');
 
     $argumentReader = new ArgumentReader($argv); //read arguments
@@ -24,12 +25,12 @@ try {
         $csvToOperation->getOperations(),
         new ExchangeRateProvider(new ExchangeRateClient())
     );
-    $operations = $processor->getCalculatedOperations();
+    $operations = $processor->getCalculatedOperations();// here is where magic happens
 } catch (Throwable $e) {
     print 'ERROR: '.$e->getMessage()."\n";
     exit;
 }
 
-foreach ($operations as $operation) {
+foreach ($operations as $operation) { // finally commission output
     print $operation->getCommission()->getCommissionAmount()."\n";
 }
