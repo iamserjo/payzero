@@ -28,6 +28,9 @@ class ReaderToOperation
         return $this->operations;
     }
 
+    /**
+     * @throws \Exception
+     */
     private function process(): void
     {
         foreach ($this->reader->getLines() as $line) {

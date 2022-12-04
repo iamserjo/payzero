@@ -6,20 +6,19 @@ namespace PayZero\App\Rule;
 
 class Deposit extends AbstractRule
 {
-    public function calculate(): self
+    public const COMMISSION_PERCENTAGE = '0.03';
+
+    public function calculate(): void
     {
         $this->getOperation()->getCommission()->setCommissionAmount(
-            bcmul(
-                $this->getOperation()->getAmount(), '0.0003', 2
+            $this->getExchangeRateConvertor()->roundUp(
+                bcmul(
+                    $this->getOperation()->getAmount(),
+                    (string) (self::COMMISSION_PERCENTAGE / 100),
+                    3
+                ),
+                $this->getOperation()->getAmountPrecision()
             )
         );
-        var_dump('deopsit commission '.$this->getOperation()->getCommission()->getCommissionAmount());
-
-        return $this;
-    }
-
-    public function getCalculatedNoFeeOperationCount(): int
-    {
-        return $this->getRemainNoFeeOperationCount();
     }
 }

@@ -18,17 +18,23 @@ class OperationToCommissionTest extends TestCase
     /**
      * @var Operation[]
      */
-    public static array $operationsFromHomework = [];
+    private static array $operationsFromHomework = [];
 
     /**
      * @var Operation[]
      */
-    public static array $operationsMoreThanThree = [];
+    private static array $operationsWhenMoreThanThree = [];
+
+    /**
+     * @var Operation[]
+     */
+    private static array $operationsWhenPrecisionZero = [];
 
     public static function setUpBeforeClass(): void
     {
         self::initOperationsFromHomework();
         self::initOperationsWhenMoreThanThree();
+        self::initOperationsWhenPrecisionZero();
     }
 
     private static function getOperationsFromHomeworkFixture(): array
@@ -214,6 +220,57 @@ class OperationToCommissionTest extends TestCase
         ];
     }
 
+    private static function getOperationsWhenPrecisionZeroFixture(): array
+    {
+        return [
+            //2015-01-01,1,private,deposit,1000,JPY
+            new Operation(
+                new \DateTime('2015-01-01'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('deposit'),
+                '1000',
+                new Currency('JPY')
+            ),
+            //2014-12-31,1,business,withdraw,1000,JPY
+            new Operation(
+                new \DateTime('2014-12-31'),
+                new User(1),
+                ClientType::create('business'),
+                OperationType::create('withdraw'),
+                '1000',
+                new Currency('JPY')
+            ),
+            //2015-01-01,1,private,withdraw,1000,JPY
+            new Operation(
+                new \DateTime('2015-01-01'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '1000',
+                new Currency('JPY')
+            ),
+            //2015-01-01,1,private,withdraw,100000,JPY
+            new Operation(
+                new \DateTime('2015-01-01'),
+                new User(1),
+                ClientType::create('private'),
+                OperationType::create('withdraw'),
+                '100000',
+                new Currency('JPY')
+            ),
+            //2015-01-02,1,business,deposit,123456,JPY
+            new Operation(
+                new \DateTime('2015-01-02'),
+                new User(1),
+                ClientType::create('business'),
+                OperationType::create('deposit'),
+                '123456',
+                new Currency('JPY')
+            ),
+        ];
+    }
+
     private static function initOperationsFromHomework(): void
     {
         $operations = self::getOperationsFromHomeworkFixture();
@@ -225,7 +282,14 @@ class OperationToCommissionTest extends TestCase
     {
         $operations = self::getOperationsWhenMoreThanThreeFixture();
         $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
-        self::$operationsMoreThanThree = $operationToCommission->getCalculatedOperations();
+        self::$operationsWhenMoreThanThree = $operationToCommission->getCalculatedOperations();
+    }
+
+    private static function initOperationsWhenPrecisionZero(): void
+    {
+        $operations = self::getOperationsWhenPrecisionZeroFixture();
+        $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
+        self::$operationsWhenPrecisionZero = $operationToCommission->getCalculatedOperations();
     }
 
     public function testCountForHomework(): void
@@ -240,7 +304,15 @@ class OperationToCommissionTest extends TestCase
     {
         $this->assertCount(
             6,
-            self::$operationsMoreThanThree
+            self::$operationsWhenMoreThanThree
+        );
+    }
+
+    public function testCountWhenPrecisionZero(): void
+    {
+        $this->assertCount(
+            5,
+            self::$operationsWhenPrecisionZero
         );
     }
 
@@ -270,14 +342,29 @@ class OperationToCommissionTest extends TestCase
     {
         $this->assertEquals(
             $expectation,
-            self::$operationsMoreThanThree[$index]->getCommission()->getCommissionAmount()
+            self::$operationsWhenMoreThanThree[$index]->getCommission()->getCommissionAmount()
         );
     }
 
-    public function dataProviderForOperationToCommissionWhenMoreThanThree(): array
+    /**
+     * @param int $index
+     * @param string $expectation
+     *
+     * @dataProvider dataProviderForOperationToCommissionWhenPrecisionZero
+     * @depends      testCountWhenPrecisionZero
+     */
+    public function testOperationsToCommissionWhenPrecisionZero(int $index, string $expectation): void
+    {
+        $this->assertEquals(
+            $expectation,
+            self::$operationsWhenPrecisionZero[$index]->getCommission()->getCommissionAmount()
+        );
+    }
+
+    private function dataProviderForOperationToCommissionWhenMoreThanThree(): array
     {
         return [
-            '2015-01-01,1,private,deposit,200.00,EUR' => [0, '0.06'],
+            '2015-01-01,1,private,deposit,200,EUR' => [0, '0.06'],
             '2014-12-31,1,private,withdraw,200.00,EUR' => [1, '0.00'],
             '2015-01-01,1,private,withdraw,100.00,EUR' => [2, '0.00'],
             '2015-01-01,1,private,withdraw,50.00,EUR' => [3, '0.00'],
@@ -286,7 +373,7 @@ class OperationToCommissionTest extends TestCase
         ];
     }
 
-    public function dataProviderForOperationToCommissionFromHomework(): array
+    private function dataProviderForOperationToCommissionFromHomework(): array
     {
         return [
             '2014-12-31,4,private,withdraw,1200.00,EUR' => [0, '0.60'],
@@ -302,6 +389,17 @@ class OperationToCommissionTest extends TestCase
             '2016-01-10,3,private,withdraw,1000.00,EUR' => [10, '0.00'],
             '2016-02-15,1,private,withdraw,300.00,EUR' => [11, '0.00'],
             '2016-02-19,5,private,withdraw,3000000,JPY' => [12, '8612'],
+        ];
+    }
+
+    private function dataProviderForOperationToCommissionWhenPrecisionZero(): array
+    {
+        return [
+            '2015-01-01,1,private,deposit,1000,JPY' => [0, '1'],
+            '2014-12-31,1,business,withdraw,1000,JPY' => [1, '38'],
+            '2015-01-01,1,private,withdraw,1000,JPY' => [2, '5'],
+            '2015-01-01,1,private,withdraw,100000000,JPY' => [3, '0'],
+            '2015-01-02,1,business,deposit,123456,JPY' => [4, '0'],
         ];
     }
 }

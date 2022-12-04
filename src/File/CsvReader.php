@@ -27,6 +27,7 @@ class CsvReader implements Reader
 
     private function readFile(): void
     {
+        // TODO: change to generators
         if (($handle = fopen($this->file->getFilePath(), 'r')) !== false) {
             while (($csvDataLine = fgetcsv($handle, 1000, ',')) !== false) {
                 $this->output[] = $csvDataLine;

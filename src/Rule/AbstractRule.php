@@ -13,7 +13,6 @@ abstract class AbstractRule implements Rule
     public function __construct(
         private readonly ExchangeRateConvertor $exchangeRateConvertor,
         private readonly Operation $operation,
-        private readonly string $baseCurrencyAmount,
         private string $remainNoFeeAmount,
         private int $remainNoFeeOperationCount
     ) {
@@ -24,7 +23,7 @@ abstract class AbstractRule implements Rule
         return $this->remainNoFeeAmount;
     }
 
-    abstract public function calculate(): self;
+    abstract public function calculate(): void;
 
     public function getOperation(): Operation
     {
@@ -36,21 +35,14 @@ abstract class AbstractRule implements Rule
         return $this->exchangeRateConvertor;
     }
 
-    public function getBaseCurrencyAmount(): string
-    {
-        return $this->baseCurrencyAmount;
-    }
-
     public function getRemainNoFeeOperationCount(): int
     {
         return $this->remainNoFeeOperationCount;
     }
 
-    public function setRemainNoFeeAmount(string $remainNoFeeAmount): self
+    public function setRemainNoFeeAmount(string $remainNoFeeAmount): void
     {
         $this->remainNoFeeAmount = $remainNoFeeAmount;
-
-        return $this;
     }
 
     public function setRemainNoFeeOperationCount(int $remainNoFeeOperationCount): void

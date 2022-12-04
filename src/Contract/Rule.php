@@ -12,7 +12,6 @@ interface Rule
     public function __construct(
         ExchangeRateConvertor $exchangeRateConvertor,
         Operation $operation,
-        string $baseCurrencyAmount,
         string $remainNoFeeAmount,
         int $operationCounter
     );
@@ -21,5 +20,5 @@ interface Rule
 
     public function getRemainNoFeeOperationCount(): int;
 
-    public function calculate(): self;
+    public function calculate(): void;
 }

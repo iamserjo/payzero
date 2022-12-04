@@ -6,18 +6,20 @@ namespace PayZero\App\Rule;
 
 class BusinessWithdraw extends AbstractRule
 {
-    public function calculate(): self
+    public const FEE_PERCENTAGE = '0.5';
+
+    public function calculate(): void
     {
         $this
             ->getOperation()
             ->getCommission()
             ->setCommissionAmount(
-                bcmul(
-                    $this->getOperation()->getAmount(), '0.005', 2
+                $this->getExchangeRateConvertor()->roundUp(
+                    bcmul(
+                        $this->getOperation()->getAmount(), (string) (self::FEE_PERCENTAGE / 100), 3
+                    ),
+                    $this->getOperation()->getAmountPrecision()
                 )
             );
-        var_dump('business commission '.$this->getOperation()->getCommission()->getCommissionAmount());
-
-        return $this;
     }
 }

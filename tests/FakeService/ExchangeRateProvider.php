@@ -20,7 +20,7 @@ class ExchangeRateProvider extends \PayZero\App\Service\ExchangeRateProvider
 
     public function getExchangeRate(Currency $currency): string
     {
-        return match ($currency->getCurrencyCode()) { //old values from the homework
+        return match ($currency->getCurrencyCode()) { //old exchange rate values from the homework
             'EUR' => '1',
             'USD' => '1.1497',
             'JPY' => '129.53',

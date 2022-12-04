@@ -13,7 +13,6 @@ class Rule
     public static function create(
         ExchangeRateConvertor $exchangeRateConvertor,
         Operation $operation,
-        string $baseCurrencyAmount,
         string $remainNoFeeAmount,
         int $operationCounter
     ): RuleInterface {
@@ -23,6 +22,6 @@ class Rule
             $class = $operation->getClientType()->getRuleClass();
         }
 
-        return new $class($exchangeRateConvertor, $operation, $baseCurrencyAmount, $remainNoFeeAmount, $operationCounter);
+        return new $class($exchangeRateConvertor, $operation, $remainNoFeeAmount, $operationCounter);
     }
 }

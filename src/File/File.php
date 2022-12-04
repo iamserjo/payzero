@@ -11,10 +11,9 @@ class File
     /**
      * @throws FileDoesNotExist
      */
-    public function __construct(private readonly string $fileName, private readonly string $directory = __DIR__)
+    public function __construct(private readonly string $fileName, private readonly string $directory)
     {
         $this->assertFileExists();
-        echo $this->fileName;
     }
 
     public function getFilePath(): string

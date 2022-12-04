@@ -22,7 +22,7 @@ class ArgumentReader
         return $this->arguments;
     }
 
-    public function getFirstArgument()
+    public function getFirstArgument(): string
     {
         return $this->arguments[1];
     }

@@ -47,6 +47,8 @@ class OperationToCommission
 
     /**
      * @return Operation[]
+     *
+     * @throws CurrencyNotFound
      */
     private function calculateCommission(): array
     {
@@ -54,12 +56,10 @@ class OperationToCommission
         foreach ($this->commissionsGroupedByWeek as $groupedPool) {
             $remainNoFeeAmount = self::NO_FEE_AMOUNT;
             $operationCounter = self::NO_FEE_TRANSACTION_COUNT;
-            var_dump('===============');
 
             /** @var Operation[] $groupedPool */
             foreach ($groupedPool as $operation) {
                 $resultOperations[] = $operation;
-                var_dump('---');
 
                 $baseCurrencyAmount = $operation->getAmount();
 
@@ -72,7 +72,6 @@ class OperationToCommission
                 $rule = Rule::create(
                     $this->exchangeRateConvertor,
                     $operation,
-                    $baseCurrencyAmount,
                     $remainNoFeeAmount,
                     $operationCounter
                 );
@@ -82,8 +81,6 @@ class OperationToCommission
                     $rule->getRemainNoFeeAmount(),
                     $operation->getCurrency(),
                 );
-
-                var_dump('base amount '.$baseCurrencyAmount);
             }
         }
 
@@ -95,13 +92,10 @@ class OperationToCommission
      */
     public function groupByWeeks(): void
     {
-//        $a = [];
         foreach ($this->operations as $operation) {
             $groupByString = $this->getGroupByString($operation);
             $this->commissionsGroupedByWeek[$groupByString][] = $operation;
-//            $a[$groupByString][] = $operation->getAmount();
         }
-//        var_dump($a);exit;
     }
 
     private function getGroupByString(Operation $operation): string
