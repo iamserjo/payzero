@@ -10,5 +10,5 @@ interface Reader
 {
     public function __construct(File $fileName);
 
-    public function getLines(): array;
+    public function readFile(): \Generator;
 }

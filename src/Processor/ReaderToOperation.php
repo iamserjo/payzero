@@ -36,7 +36,7 @@ class ReaderToOperation
      */
     private function process(): \Generator
     {
-        foreach ($this->reader->getLines() as $line) {
+        foreach ($this->reader->readFile() as $line) {
             yield new Operation(
                 new \DateTime((string) $line[0]),
                 new User((int) $line[1]),
