@@ -25,12 +25,12 @@ try {
         $csvToOperation->getOperations(),
         new ExchangeRateProvider(new ExchangeRateClient())
     );
-    $operations = $processor->getCalculatedOperations();// here is where magic happens
+    foreach ($processor->getCalculatedOperations() as $operation) { // finally commission output
+        print $operation->getCommission()->getCommissionAmount()."\n";
+    }
 } catch (Throwable $e) {
     print 'ERROR: '.$e->getMessage()."\n";
     exit;
 }
 
-foreach ($operations as $operation) { // finally commission output
-    print $operation->getCommission()->getCommissionAmount()."\n";
-}
+

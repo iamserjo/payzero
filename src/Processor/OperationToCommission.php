@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PayZero\App\Processor;
 
+use Generator;
 use PayZero\App\Contract\ExchangeRateProvider;
 use PayZero\App\Entity\Operation;
 use PayZero\App\Exception\CurrencyNotFound;
@@ -25,10 +26,11 @@ class OperationToCommission
     private ExchangeRateConvertor $exchangeRateConvertor;
 
     /**
-     * @param Operation[] $operations
+     * @param array|Generator      $operations
+     * @param ExchangeRateProvider $exchangeRateProvider
      */
     public function __construct(
-        private readonly array $operations,
+        private readonly array|Generator $operations,
         private readonly ExchangeRateProvider $exchangeRateProvider
     ) {
         $this->exchangeRateConvertor = new ExchangeRateConvertor($this->exchangeRateProvider);
@@ -36,31 +38,16 @@ class OperationToCommission
     }
 
     /**
-     * @return Operation[]
-     *
      * @throws CurrencyNotFound
      */
-    public function getCalculatedOperations(): array
+    public function getCalculatedOperations(): Generator
     {
-        return $this->calculateCommission();
-    }
-
-    /**
-     * @return Operation[]
-     *
-     * @throws CurrencyNotFound
-     */
-    private function calculateCommission(): array
-    {
-        $resultOperations = [];
         foreach ($this->commissionsGroupedByWeek as $groupedByWeek) {
             $remainNoFeeAmount = self::NO_FEE_AMOUNT;
             $operationCounter = self::NO_FEE_TRANSACTION_COUNT;
 
             /** @var Operation[] $groupedByWeek */
             foreach ($groupedByWeek as $operation) {
-                $resultOperations[] = $operation;
-
                 // converting remain no fee amount to currency of operation
                 $remainNoFeeAmount = $this->exchangeRateConvertor->convert(
                     $remainNoFeeAmount,
@@ -79,10 +66,9 @@ class OperationToCommission
                     $rule->getRemainNoFeeAmount(),
                     $operation->getCurrency(),
                 );
+                yield $operation;
             }
         }
-
-        return $resultOperations;
     }
 
     /**

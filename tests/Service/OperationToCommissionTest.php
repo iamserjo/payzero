@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PayZero\App\Tests\Service;
 
+use Generator;
 use PayZero\App\Entity\Currency;
 use PayZero\App\Entity\Operation;
 use PayZero\App\Entity\User;
@@ -257,21 +258,27 @@ class OperationToCommissionTest extends TestCase
     {
         $operations = self::getOperationsFromHomeworkFixture();
         $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
-        self::$operationsFromHomework = $operationToCommission->getCalculatedOperations();
+        foreach ($operationToCommission->getCalculatedOperations() as $operation) {
+            self::$operationsFromHomework[] = $operation;
+        }
     }
 
     private static function initOperationsWhenMoreThanThree(): void
     {
         $operations = self::getOperationsWhenMoreThanThreeFixture();
         $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
-        self::$operationsWhenMoreThanThree = $operationToCommission->getCalculatedOperations();
+        foreach ($operationToCommission->getCalculatedOperations() as $operation) {
+            self::$operationsWhenMoreThanThree[] = $operation;
+        }
     }
 
     private static function initOperationsWhenPrecisionZero(): void
     {
         $operations = self::getOperationsWhenPrecisionZeroFixture();
         $operationToCommission = new OperationToCommission($operations, new ExchangeRateProvider());
-        self::$operationsWhenPrecisionZero = $operationToCommission->getCalculatedOperations();
+        foreach ($operationToCommission->getCalculatedOperations() as $operation) {
+            self::$operationsWhenPrecisionZero[] = $operation;
+        }
     }
 
     public function testCountForHomework(): void

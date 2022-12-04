@@ -15,26 +15,15 @@ use PayZero\App\Factory\OperationType;
 
 class ReaderToOperation
 {
-    /**
-     * @var Operation[]
-     */
-    private array $operations = [];
-
     public function __construct(private readonly Reader $reader)
     {
-        $this->process();
-    }
-
-    public function getOperations(): array
-    {
-        return $this->operations;
     }
 
     /**
      * @throws FactoryCreationFailure
      * @throws Exception
      */
-    private function process(): \Generator
+    public function getOperations(): \Generator
     {
         foreach ($this->reader->readFile() as $line) {
             yield new Operation(
