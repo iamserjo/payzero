@@ -30,6 +30,7 @@
         "phpunit": "phpunit",
         "fix-cs": "php-cs-fixer fix",
         "test-cs": "php-cs-fixer fix --dry-run -v",
+        "calculate-comission": "php script.php",
         "test": ["@phpunit", "@test-cs"]
     }
 }

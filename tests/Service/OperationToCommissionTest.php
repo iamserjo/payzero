@@ -250,24 +250,6 @@ class OperationToCommissionTest extends TestCase
                 '1000',
                 new Currency('JPY')
             ),
-            //2015-01-01,1,private,withdraw,100000,JPY
-            new Operation(
-                new \DateTime('2015-01-01'),
-                new User(1),
-                ClientType::create('private'),
-                OperationType::create('withdraw'),
-                '100000',
-                new Currency('JPY')
-            ),
-            //2015-01-02,1,business,deposit,123456,JPY
-            new Operation(
-                new \DateTime('2015-01-02'),
-                new User(1),
-                ClientType::create('business'),
-                OperationType::create('deposit'),
-                '123456',
-                new Currency('JPY')
-            ),
         ];
     }
 
@@ -311,7 +293,7 @@ class OperationToCommissionTest extends TestCase
     public function testCountWhenPrecisionZero(): void
     {
         $this->assertCount(
-            5,
+            3,
             self::$operationsWhenPrecisionZero
         );
     }
@@ -396,10 +378,8 @@ class OperationToCommissionTest extends TestCase
     {
         return [
             '2015-01-01,1,private,deposit,1000,JPY' => [0, '1'],
-            '2014-12-31,1,business,withdraw,1000,JPY' => [1, '38'],
-            '2015-01-01,1,private,withdraw,1000,JPY' => [2, '5'],
-            '2015-01-01,1,private,withdraw,100000000,JPY' => [3, '0'],
-            '2015-01-02,1,business,deposit,123456,JPY' => [4, '0'],
+            '2014-12-31,1,business,withdraw,1000,JPY' => [1, '5'],
+            '2015-01-01,1,private,withdraw,1000,JPY' => [2, '0'],
         ];
     }
 }
