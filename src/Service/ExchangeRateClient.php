@@ -64,7 +64,6 @@ class ExchangeRateClient
     private function readEnv(): void
     {
         $this->apiUrl = getenv('EXCHANGE_RATE_API_URL') === false ?
-            throw new EnvFileInvalid('.env file is missing or not configured') :
-            getenv('EXCHANGE_RATE_API_URL');
+            throw new EnvFileInvalid('.env file is missing or not configured') : getenv('EXCHANGE_RATE_API_URL');
     }
 }
