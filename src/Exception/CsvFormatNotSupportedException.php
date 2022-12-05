@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace PayZero\App\Exception;
 
-class CvsFormatNotSupportedException extends \Exception
+class CsvFormatNotSupportedException extends \Exception
 {
 }

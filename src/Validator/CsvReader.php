@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace PayZero\App\Validator;
 
 use PayZero\App\Contract\Validator;
-use PayZero\App\Exception\CvsFormatNotSupportedException;
+use PayZero\App\Exception\CsvFormatNotSupportedException;
 
 class CsvReader implements Validator
 {
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     public function validate($data): void
     {
@@ -27,72 +27,72 @@ class CsvReader implements Validator
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertCountValid($line): void
     {
         if (count($line) !== 6) {
-            throw new CvsFormatNotSupportedException('File format is not supported');
+            throw new CsvFormatNotSupportedException('File format is not supported');
         }
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertDateValid($value): void
     {
         if (!strtotime($value)) {
-            throw new CvsFormatNotSupportedException('Date '.$value.' is not valid');
+            throw new CsvFormatNotSupportedException('Date '.$value.' is not valid');
         }
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertUserValid($value): void
     {
         if (!ctype_digit($value)) {
-            throw new CvsFormatNotSupportedException('User id "'.$value.'" is not a number');
+            throw new CsvFormatNotSupportedException('User id "'.$value.'" is not a number');
         }
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertClientTypeValid($value): void
     {
         if (!in_array($value, ['business', 'private'], true)) {
-            throw new CvsFormatNotSupportedException('Client type '.$value.' is not valid');
+            throw new CsvFormatNotSupportedException('Client type '.$value.' is not valid');
         }
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertOperationTypeValid($value): void
     {
         if (!in_array($value, ['withdraw', 'deposit'], true)) {
-            throw new CvsFormatNotSupportedException('Operation type '.$value.' is not valid');
+            throw new CsvFormatNotSupportedException('Operation type '.$value.' is not valid');
         }
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertAmountValueValid($value): void
     {
         if (!is_numeric($value)) {
-            throw new CvsFormatNotSupportedException('Amount value '.$value.' is not valid');
+            throw new CsvFormatNotSupportedException('Amount value '.$value.' is not valid');
         }
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function assertCurrencyValid($string): void
     {
         if (strlen($string) !== 3) { // it will be double-checked later in the code for existing the currency
-            throw new CvsFormatNotSupportedException('Currency value '.$string.' is not valid');
+            throw new CsvFormatNotSupportedException('Currency value '.$string.' is not valid');
         }
     }
 }

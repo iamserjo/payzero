@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace PayZero\App\File;
 
 use PayZero\App\Contract\Reader;
-use PayZero\App\Exception\CvsFormatNotSupportedException;
+use PayZero\App\Exception\CsvFormatNotSupportedException;
 
 class CsvReader implements Reader
 {
     private array $output = [];
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     public function __construct(private readonly File $file)
     {
@@ -30,7 +30,7 @@ class CsvReader implements Reader
     }
 
     /**
-     * @throws CvsFormatNotSupportedException
+     * @throws CsvFormatNotSupportedException
      */
     private function validateFile(): void
     {
