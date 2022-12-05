@@ -13,7 +13,7 @@ class ExchangeRateClient
 {
     private Validator $validator;
     private array $structure = [];
-    private string $apiUrl = '';
+    private string $apiUrl;
 
     /**
      * @throws ExchangeRateClientInvalidResponse
@@ -44,6 +44,7 @@ class ExchangeRateClient
      */
     private function saveInMemory(): void
     {
+        // saving in memory. for real cases in should be singletone
         $this->structure = json_decode($this->getApiResponse(), true);
         $this->validate($this->structure);
     }

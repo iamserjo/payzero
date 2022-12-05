@@ -21,7 +21,7 @@ try {
     $csvReader = new CsvReader($file); // creating csv reader to parse the csv file from arg #1, validate as well
     $csvToOperation = new ReaderToOperation($csvReader); //creating entities from csv
     //creating commissions from operation entities with exchange rate
-    $processor = new OperationToCommission(
+    $processor = new OperationToCommission( // this is where magic happens. Operations get filled with commission
         $csvToOperation->getOperations(),
         new ExchangeRateProvider(new ExchangeRateClient())
     );
@@ -30,7 +30,7 @@ try {
     }
 } catch (Throwable $e) {
     print 'ERROR: '.$e->getMessage()."\n";
-    exit;
+    exit(1);
 }
 
 

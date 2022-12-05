@@ -30,6 +30,7 @@ class PrivateWithdraw extends AbstractRule
         } else { // apply the fee
             $this->setRemainNoFeeAmount('0');
 
+            // precision 3 used to round up correctly
             $commission = bcmul($commissionFromAmount, (string) (self::FEE_PERCENTAGE / 100), 3);
             $commission = $this->getExchangeRateConvertor()->roundUp(
                 $commission,

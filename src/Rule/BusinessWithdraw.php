@@ -16,6 +16,7 @@ class BusinessWithdraw extends AbstractRule
             ->setCommissionAmount(
                 $this->getExchangeRateConvertor()->roundUp(
                     bcmul(
+                        // precision 3 used to round up correctly
                         $this->getOperation()->getAmount(), (string) (self::FEE_PERCENTAGE / 100), 3
                     ),
                     $this->getOperation()->getAmountPrecision()

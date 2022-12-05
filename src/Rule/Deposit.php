@@ -15,7 +15,7 @@ class Deposit extends AbstractRule
                 bcmul(
                     $this->getOperation()->getAmount(),
                     (string) (self::FEE_PERCENTAGE / 100),
-                    3
+                    3// precision 3 used to round up correctly
                 ),
                 $this->getOperation()->getAmountPrecision()
             )
