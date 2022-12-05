@@ -44,7 +44,7 @@ class ExchangeRateClient
      */
     private function saveInMemory(): void
     {
-        // saving in memory. for real cases in should be singletone
+        // saving in memory. for real cases in should be singleton
         $this->structure = json_decode($this->getApiResponse(), true);
         $this->validate($this->structure);
     }

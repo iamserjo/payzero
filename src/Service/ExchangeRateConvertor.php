@@ -35,10 +35,6 @@ class ExchangeRateConvertor
      * Round up is used to make
      * 0.01 to 1 when precision 0
      * 0.023 to 0.03 when precision 2.
-     *
-     * @param string $value
-     * @param $precision
-     * @return string
      */
     public function roundUp(string $value, $precision): string
     {
