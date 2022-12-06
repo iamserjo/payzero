@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace PayZero\App\Service;
 
-use PayZero\App\Contract\Validator;
 use PayZero\App\Exception\EnvFileInvalid;
 use PayZero\App\Exception\ExchangeRateClientInvalidResponse;
 use PayZero\App\Validator\ExchangeRateClient as ExchangeRateClientValidator;
 
 class ExchangeRateClient
 {
-    private Validator $validator;
     private array $structure = [];
     private string $apiUrl;
 
@@ -19,24 +17,21 @@ class ExchangeRateClient
      * @throws ExchangeRateClientInvalidResponse
      * @throws EnvFileInvalid
      */
-    public function __construct()
+    public function __construct(private readonly ExchangeRateClientValidator $validator)
     {
-        $this->validator = new ExchangeRateClientValidator();
         $this->readEnv();
         $this->saveInMemory();
     }
 
     private function getApiResponse(): bool|string
     {
-        return file_get_contents($this->apiUrl);
-    }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
+        $result = curl_exec($ch);
+        curl_close($ch);
 
-    /**
-     * @throws ExchangeRateClientInvalidResponse
-     */
-    private function validate($data): void
-    {
-        $this->validator->validate($data);
+        return $result;
     }
 
     /**
@@ -46,7 +41,7 @@ class ExchangeRateClient
     {
         // saving in memory. for real cases in should be singleton
         $this->structure = json_decode($this->getApiResponse(), true);
-        $this->validate($this->structure);
+        $this->validator->validate($this->structure);
     }
 
     public function getBaseCurrencyCode(): string

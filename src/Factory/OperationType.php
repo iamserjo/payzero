@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace PayZero\App\Factory;
 
 use PayZero\App\Contract\OperationType as OperationTypeInterface;
+use PayZero\App\Entity\Operation\DepositType;
+use PayZero\App\Entity\Operation\WithdrawType;
 use PayZero\App\Exception\FactoryCreationFailure;
 
 class OperationType
@@ -12,20 +14,12 @@ class OperationType
     /**
      * @throws FactoryCreationFailure
      */
-    public static function create($type): OperationTypeInterface
+    public static function create($typeName): OperationTypeInterface
     {
-        // I hate this approach :D
-        $class = '\PayZero\App\Entity\Operation\\'.ucfirst($type).'Type';
-
-        if (!class_exists($class)) {
-            throw new FactoryCreationFailure('client type '.$type.' failure');
-        }
-        /*
-         * @var $typeClass OperationTypeInterface
-         */
-        $typeClass = new $class();
-        $typeClass->setTypeName($type);
-
-        return $typeClass;
+        return match ($typeName) {
+            'withdraw' => new WithdrawType($typeName),
+            'deposit' => new DepositType($typeName),
+            'default' => throw new FactoryCreationFailure('client type '.$typeName.' creation failure')
+        };
     }
 }

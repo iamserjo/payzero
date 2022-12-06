@@ -14,16 +14,14 @@ class CsvReader implements Validator
      */
     public function validate($data): void
     {
-        foreach ($data as $line) {
-            $this->assertCountValid($line);
+        $this->assertCountValid($data);
 
-            $this->assertDateValid($line[0]);
-            $this->assertUserValid($line[1]);
-            $this->assertClientTypeValid($line[2]);
-            $this->assertOperationTypeValid($line[3]);
-            $this->assertAmountValueValid($line[4]);
-            $this->assertCurrencyValid($line[5]);
-        }
+        $this->assertDateValid($data[0]);
+        $this->assertUserValid($data[1]);
+        $this->assertClientTypeValid($data[2]);
+        $this->assertOperationTypeValid($data[3]);
+        $this->assertAmountValueValid($data[4]);
+        $this->assertCurrencyValid($data[5]);
     }
 
     /**

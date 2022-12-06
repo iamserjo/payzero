@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace PayZero\App\Factory;
 
 use PayZero\App\Contract\ClientType as ClientTypeInterface;
+use PayZero\App\Entity\Client\BusinessType;
+use PayZero\App\Entity\Client\PrivateType;
 use PayZero\App\Exception\FactoryCreationFailure;
 
 class ClientType
@@ -12,20 +14,12 @@ class ClientType
     /**
      * @throws FactoryCreationFailure
      */
-    public static function create($type): ClientTypeInterface
+    public static function create($typeName): ClientTypeInterface
     {
-        // I hate this approach :D
-        $class = '\PayZero\App\Entity\Client\\'.ucfirst($type).'Type';
-
-        if (!class_exists($class)) {
-            throw new FactoryCreationFailure('client type '.$type.' failure');
-        }
-        /**
-         * @var $class ClientTypeInterface
-         */
-        $classType = new $class();
-        $classType->setTypeName($type);
-
-        return $classType;
+        return match ($typeName) {
+            'business' => new BusinessType($typeName),
+            'private' => new PrivateType($typeName),
+            'default' => throw new FactoryCreationFailure('client type '.$typeName.' creation failure')
+        };
     }
 }

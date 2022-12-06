@@ -26,6 +26,6 @@ class ExchangeRateProvider implements ExchangeRateProviderInterface
     {
         $exchangeRateList = $this->exchangeRateClient->getExchangeRateList();
 
-        return (string) $exchangeRateList[$currency->getCurrencyCode()] ?? throw new CurrencyNotFound();
+        return (string) ($exchangeRateList[$currency->getCurrencyCode()] ?? throw new CurrencyNotFound());
     }
 }

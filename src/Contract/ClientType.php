@@ -6,7 +6,7 @@ namespace PayZero\App\Contract;
 
 interface ClientType
 {
-    public function setTypeName(string $name);
+    public function __construct(string $typeName);
 
     public function getTypeName(): string;
 

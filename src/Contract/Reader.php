@@ -8,7 +8,7 @@ use PayZero\App\File\File;
 
 interface Reader
 {
-    public function __construct(File $fileName);
+    public function __construct(Validator $validator, File $fileName);
 
     public function readFile(): \Generator;
 }

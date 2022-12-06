@@ -9,11 +9,8 @@ use PayZero\App\Rule\PrivateWithdraw;
 
 class WithdrawType implements OperationType
 {
-    protected string $typeName = '';
-
-    public function setTypeName(string $name): void
+    public function __construct(protected string $typeName)
     {
-        $this->typeName = $name;
     }
 
     public function getTypeName(): string

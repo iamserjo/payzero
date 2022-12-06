@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PayZero\App\Service;
 
+use BCMathExtended\BC;
 use PayZero\App\Entity\Currency;
 use PayZero\App\Exception\CurrencyNotFound;
 
@@ -38,10 +39,11 @@ class ExchangeRateConvertor
      */
     public function roundUp(string $value, $precision): string
     {
-        $value = (float) $value;
-        $pow = pow(10, $precision);
-        $float = ((ceil($pow * $value) + ceil($pow * $value - ceil($pow * $value))) / $pow);
-
-        return number_format($float, $precision, '.', '');
+        return number_format(
+            (float) BC::roundUp($value, $precision),
+            $precision,
+            '.',
+            ''
+        );
     }
 }
