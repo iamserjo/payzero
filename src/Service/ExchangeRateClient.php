@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace PayZero\App\Service;
 
+use PayZero\App\Contract\Validator;
 use PayZero\App\Exception\EnvFileInvalid;
 use PayZero\App\Exception\ExchangeRateClientInvalidResponse;
-use PayZero\App\Validator\ExchangeRateClient as ExchangeRateClientValidator;
 
 class ExchangeRateClient
 {
@@ -17,7 +17,7 @@ class ExchangeRateClient
      * @throws ExchangeRateClientInvalidResponse
      * @throws EnvFileInvalid
      */
-    public function __construct(private readonly ExchangeRateClientValidator $validator)
+    public function __construct(private readonly Validator $validator)
     {
         $this->readEnv();
         $this->saveInMemory();

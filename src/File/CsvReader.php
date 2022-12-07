@@ -10,8 +10,6 @@ use PayZero\App\Exception\CsvFormatNotSupportedException;
 
 class CsvReader implements Reader
 {
-    private array $output = [];
-
     public function __construct(private readonly Validator $validator, private readonly File $file)
     {
     }
