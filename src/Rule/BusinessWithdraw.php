@@ -4,23 +4,36 @@ declare(strict_types=1);
 
 namespace PayZero\App\Rule;
 
-class BusinessWithdraw extends AbstractRule
+use PayZero\App\Contract\Rule;
+use PayZero\App\Entity\Operation;
+use PayZero\App\Service\ExchangeRateConvertor;
+
+class BusinessWithdraw implements Rule
 {
     public const FEE_PERCENTAGE = '0.5';
 
-    public function calculate(): void
+    public function __construct(
+        private readonly ExchangeRateConvertor $exchangeRateConvertor,
+        private readonly array $operations,
+    ) {
+    }
+
+    public function calculate(): \Generator
     {
-        $this
-            ->getOperation()
-            ->getCommission()
-            ->setCommissionAmount(
-                $this->getExchangeRateConvertor()->roundUp(
-                    bcmul(
-                        // precision 3 used to round up correctly
-                        $this->getOperation()->getAmount(), (string) (self::FEE_PERCENTAGE / 100), 3
-                    ),
-                    $this->getOperation()->getAmountPrecision()
-                )
-            );
+        foreach ($this->operations as $operation) {
+            /* @var $operation Operation */
+            $operation
+                ->getCommission()
+                ->setCommissionAmount(
+                    $this->exchangeRateConvertor->roundUp(
+                        bcmul(
+                            // precision 3 is used to round up correctly
+                            $operation->getAmount(), (string) (self::FEE_PERCENTAGE / 100), 3
+                        ),
+                        $operation->getAmountPrecision()
+                    )
+                );
+            yield $operation;
+        }
     }
 }

@@ -10,18 +10,20 @@ use PayZero\App\Service\ExchangeRateConvertor;
 
 class Rule
 {
+    /**
+     * @param Operation[] $operations
+     */
     public static function create(
         ExchangeRateConvertor $exchangeRateConvertor,
-        Operation $operation,
-        string $remainNoFeeAmount,
-        int $operationCounter
+        array $operations,
     ): RuleInterface {
+        $operation = $operations[0];
         if ($operation->getOperationType() instanceof Operation\DepositType) {
             $class = $operation->getOperationType()->getRuleClass();
         } else {
             $class = $operation->getClientType()->getRuleClass();
         }
 
-        return new $class($exchangeRateConvertor, $operation, $remainNoFeeAmount, $operationCounter);
+        return new $class($exchangeRateConvertor, $operations);
     }
 }

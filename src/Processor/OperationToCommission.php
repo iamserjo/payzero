@@ -7,14 +7,11 @@ namespace PayZero\App\Processor;
 use Generator;
 use PayZero\App\Contract\ExchangeRateProvider;
 use PayZero\App\Entity\Operation;
-use PayZero\App\Exception\CurrencyNotFound;
 use PayZero\App\Factory\Rule;
 use PayZero\App\Service\ExchangeRateConvertor;
 
 class OperationToCommission
 {
-    public const NO_FEE_AMOUNT = '1000';
-    public const NO_FEE_TRANSACTION_COUNT = 3;
     private const START_RANGE_PATTERN = 'monday this week';
     private const END_RANGE_PATTERN = 'sunday this week';
 
@@ -34,43 +31,43 @@ class OperationToCommission
         private readonly ExchangeRateProvider $exchangeRateProvider
     ) {
         $this->exchangeRateConvertor = new ExchangeRateConvertor($this->exchangeRateProvider);
-        $this->groupByWeeks(); // group by weeks first
     }
 
-    /**
-     * @throws CurrencyNotFound
-     */
-    public function getCalculatedOperations(): Generator
+    private function getRuleKeyByOperation(Operation $operation): string
     {
-        // using already grouped operations by week
-        foreach ($this->commissionsGroupedByWeek as $groupedByWeek) {
-            $remainNoFeeAmount = self::NO_FEE_AMOUNT;
-            $operationCounter = self::NO_FEE_TRANSACTION_COUNT;
+        if ($operation->getOperationType() instanceof Operation\DepositType) {
+            return $operation->getOperationType()->getRuleClass();
+        } else {
+            return $operation->getClientType()->getRuleClass();
+        }
+    }
 
+    private function getGroupedByWeekAndOperation(): Generator
+    {
+        $groupedByWeekAndRule = [];
+        // using already grouped operations by week
+        foreach ($this->groupByWeeks() as $key => $groupedByWeek) {
             /** @var Operation[] $groupedByWeek */
             foreach ($groupedByWeek as $operation) {
-                // converting remain no fee amount to currency of operation
-                $remainNoFeeAmount = $this->exchangeRateConvertor->convert(
-                    $remainNoFeeAmount,
-                    $operation->getCurrency()
-                );
+                // group operations by rule
+                $groupedByWeekAndRule[$key][$this->getRuleKeyByOperation($operation)][] = $operation;
+            }
+            yield $groupedByWeekAndRule[$key];
+        }
+    }
 
-                // creating one of three rules
+    public function getCalculatedOperations(): Generator
+    {
+        foreach ($this->getGroupedByWeekAndOperation() as $weekKey => $groupedByWeek) {
+            foreach ($groupedByWeek as $operationsForRule) {
                 $rule = Rule::create(
                     $this->exchangeRateConvertor,
-                    $operation,
-                    $remainNoFeeAmount,
-                    $operationCounter
+                    $operationsForRule,
                 );
-                $rule->calculate();
-                // return counter to pass it from the loop to rule again
-                $operationCounter = $rule->getRemainNoFeeOperationCount();
-                // return remain no fee amount to pass it from the loop to rule again
-                $remainNoFeeAmount = $this->exchangeRateConvertor->convertToBaseCurrency(
-                    $rule->getRemainNoFeeAmount(),
-                    $operation->getCurrency(),
-                );
-                yield $operation;
+
+                foreach ($rule->calculate() as $operation) {
+                    yield $operation;
+                }
             }
         }
     }
@@ -78,12 +75,15 @@ class OperationToCommission
     /**
      * Group weeks to work easier with calculations further.
      */
-    public function groupByWeeks(): void
+    private function groupByWeeks(): array
     {
+        $commissionsGroupedByWeek = [];
         foreach ($this->operations as $operation) {
             $groupByString = $this->getGroupByString($operation);
-            $this->commissionsGroupedByWeek[$groupByString][] = $operation;
+            $commissionsGroupedByWeek[$groupByString][] = $operation;
         }
+
+        return $commissionsGroupedByWeek;
     }
 
     /**
