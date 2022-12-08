@@ -15,11 +15,6 @@ class OperationToCommission
     private const START_RANGE_PATTERN = 'monday this week';
     private const END_RANGE_PATTERN = 'sunday this week';
 
-    /**
-     * Pool of dates: weeks.
-     */
-    private array $commissionsGroupedByWeek = [];
-
     private ExchangeRateConvertor $exchangeRateConvertor;
 
     /**
@@ -58,7 +53,7 @@ class OperationToCommission
 
     public function getCalculatedOperations(): Generator
     {
-        foreach ($this->getGroupedByWeekAndOperation() as $weekKey => $groupedByWeek) {
+        foreach ($this->getGroupedByWeekAndOperation() as $groupedByWeek) {
             foreach ($groupedByWeek as $operationsForRule) {
                 $rule = Rule::create(
                     $this->exchangeRateConvertor,

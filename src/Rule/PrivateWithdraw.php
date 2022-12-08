@@ -12,7 +12,6 @@ use PayZero\App\Service\ExchangeRateConvertor;
 class PrivateWithdraw implements Rule
 {
     public const FEE_PERCENTAGE = '0.3';
-
     public const NO_FEE_AMOUNT = '1000';
     public const NO_FEE_TRANSACTION_COUNT = 3;
 
